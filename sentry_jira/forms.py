@@ -135,9 +135,7 @@ class JIRAIssueForm(forms.Form):
         label=_("Issue Summary"),
         widget=forms.TextInput(attrs={'class': 'span6'})
     )
-    description = forms.CharField(
-        widget=forms.Textarea(attrs={"class": 'span6'})
-    )
+
 
     def __init__(self, *args, **kwargs):
         self.ignored_fields = kwargs.pop("ignored_fields")
@@ -221,13 +219,6 @@ class JIRAIssueForm(forms.Form):
 
     make_choices = lambda self, x: [(y["id"], y["name"] if "name" in y else y["value"]) for y in x] if x else []
 
-    def clean_description(self):
-        """
-        Turn code blocks that are in the stack trace into JIRA code blocks.
-        """
-        desc = self.cleaned_data["description"]
-        return desc.replace("```", "{code}")
-
     def clean(self):
         """
         The form clean method needs to take advantage of the loaded issue type
@@ -244,7 +235,7 @@ class JIRAIssueForm(forms.Form):
         fs = self.issue_type["fields"]
         for field in fs.keys():
             f = fs[field]
-            if field in ["description", "summary"]:
+            if field in ["summary"]:
                 continue
             if field in very_clean.keys():
                 v = very_clean.get(field)
